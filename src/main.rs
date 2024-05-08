@@ -67,6 +67,7 @@ pub struct Config {
     distance_unit: DistanceUnit,
     currency: Currency,
     hello_message: String,
+    hello_message_color: String,
 }
 
 #[get("/fragments/app.html")]
@@ -82,37 +83,46 @@ async fn app(ctx: web::Query<Context>) -> impl Responder {
     let config: Config = serde_json::from_slice(&res_string).unwrap();
 
     let table = format!(r#"
-<table class="table-auto border-separate border-spacing-2 border border-slate-400">
-  <h2 class="my-4 text-xl sm:text-2xl text-slate-700 tracking-tight dark:text-slate-100">
-    Fare for city: <span class="font-bold">{city}</span>
-  </h2>
-  <thead>
-    <tr>
-      <th class="p-4 border border-slate-300" scope="col">Component</th>
-      <th class="p-4 border border-slate-300" scope="col">Charge</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="p-4 border border-slate-300" scope="row">Hello Message</td>
-      <td class="p-4 border border-slate-300">{message}</td>
-    </tr>
-    <tr>
-      <td class="p-4 border border-slate-300" scope="row">Base rate</td>
-      <td class="p-4 border border-slate-300">{currency} {base_rate}</td>
-    </tr>
-    <tr>
-      <td class="p-4 border border-slate-300" scope="row">Per KM rate</td>
-      <td class="p-4 border border-slate-300">{currency} {per_distance_unit_rate}</td>
-    </tr>
-    <tr>
-      <td class="p-4 border border-slate-300" scope="row">Total fare for 10 {distance_unit} ride</td>
-      <td class="p-4 border border-slate-300">{currency} {total_fare}</td>
-    </tr>
-  </tbody>
-  <tfoot>
-  </tfoot>
-</table>"#, currency = config.currency, base_rate = config.base_rate, per_distance_unit_rate = config.per_distance_unit_rate, total_fare = (config.base_rate + 10.0 * config.per_distance_unit_rate), distance_unit = config.distance_unit, message = config.hello_message);
+    <style>
+      .blink {{
+        animation: blinker 2s linear infinite;
+        color: {color};
+      }}
+
+      @keyframes blinker {{
+        50% {{
+          opacity: 0;
+        }}
+      }}
+    </style>
+
+    <table class="table-auto border-separate border-spacing-2 border border-slate-400">
+      <h2 class="my-4 text-xl sm:text-2xl text-slate-700 tracking-tight dark:text-slate-100">
+        Fare for city: <span class="font-bold">{city}</span> - <span class="blink">{message}</span>
+      </h2>
+      <thead>
+        <tr>
+          <th class="p-4 border border-slate-300" scope="col">Component</th>
+          <th class="p-4 border border-slate-300" scope="col">Charge</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="p-4 border border-slate-300" scope="row">Base rate</td>
+          <td class="p-4 border border-slate-300">{currency} {base_rate}</td>
+        </tr>
+        <tr>
+          <td class="p-4 border border-slate-300" scope="row">Per KM rate</td>
+          <td class="p-4 border border-slate-300">{currency} {per_distance_unit_rate}</td>
+        </tr>
+        <tr>
+          <td class="p-4 border border-slate-300" scope="row">Total fare for 10 {distance_unit} ride</td>
+          <td class="p-4 border border-slate-300">{currency} {total_fare}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+      </tfoot>
+    </table>"#, currency = config.currency, base_rate = config.base_rate, per_distance_unit_rate = config.per_distance_unit_rate, total_fare = (config.base_rate + 10.0 * config.per_distance_unit_rate), distance_unit = config.distance_unit, message = config.hello_message, color = config.hello_message_color);
 
     // HttpResponse::Ok().body()
     HttpResponse::Ok().body(table)
