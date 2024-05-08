@@ -66,12 +66,14 @@ pub struct Config {
     per_distance_unit_rate: f64,
     distance_unit: DistanceUnit,
     currency: Currency,
+    hello_message: String,
 }
 
 #[get("/fragments/app.html")]
 async fn app(ctx: web::Query<Context>) -> impl Responder {
     let city = ctx.city.clone().unwrap_or("Bangalore".to_string());
-    let vehicle_type = ctx.into_inner().vehicle_type.unwrap_or(Vehicle::Cab);
+    let context = ctx.into_inner();
+    let vehicle_type = context.vehicle_type.unwrap_or(Vehicle::Cab);
     let client = Client::default();
     let req = client.get(format!("http://localhost:8080/config/resolve?city={city}&vehicle_type={vehicle_type}"))
         .insert_header(("x-tenant", "dev"));
@@ -92,6 +94,10 @@ async fn app(ctx: web::Query<Context>) -> impl Responder {
   </thead>
   <tbody>
     <tr>
+      <td class="p-4 border border-slate-300" scope="row">Hello Message</td>
+      <td class="p-4 border border-slate-300">{message}</td>
+    </tr>
+    <tr>
       <td class="p-4 border border-slate-300" scope="row">Base rate</td>
       <td class="p-4 border border-slate-300">{currency} {base_rate}</td>
     </tr>
@@ -106,7 +112,7 @@ async fn app(ctx: web::Query<Context>) -> impl Responder {
   </tbody>
   <tfoot>
   </tfoot>
-</table>"#, currency = config.currency, base_rate = config.base_rate, per_distance_unit_rate = config.per_distance_unit_rate, total_fare = (config.base_rate + 10.0 * config.per_distance_unit_rate), distance_unit = config.distance_unit);
+</table>"#, currency = config.currency, base_rate = config.base_rate, per_distance_unit_rate = config.per_distance_unit_rate, total_fare = (config.base_rate + 10.0 * config.per_distance_unit_rate), distance_unit = config.distance_unit, message = config.hello_message);
 
     // HttpResponse::Ok().body()
     HttpResponse::Ok().body(table)
