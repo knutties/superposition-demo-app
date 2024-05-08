@@ -58,6 +58,7 @@ impl fmt::Display for Vehicle {
 pub struct Context {
     city: Option<String>,
     vehicle_type: Option<Vehicle>,
+    hour_of_day: Option<u8>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -76,9 +77,11 @@ async fn app(ctx: web::Query<Context>) -> impl Responder {
     let city = ctx.city.clone().unwrap_or("Bangalore".to_string());
     let context = ctx.into_inner();
     let vehicle_type = context.vehicle_type.unwrap_or(Vehicle::Cab);
+    let hour_of_day = context.hour_of_day.unwrap_or(0);
     let client = Client::default();
-    let req = client.get(format!("http://localhost:8080/config/resolve?city={city}&vehicle_type={vehicle_type}"))
+    let req = client.get(format!("http://localhost:8080/config/resolve?city={city}&vehicle_type={vehicle_type}&hour_of_day={hour_of_day}"))
         .insert_header(("x-tenant", "dev"));
+    // println!("{}", format!("http://localhost:8080/config/resolve?city={city}&vehicle_type={vehicle_type}&hour_of_day={hour_of_day}"));
     let mut res = req.send().await.expect("Failed to send request");
     let res_string = res.body().await.expect("Failed to read response body").to_vec();
     let config: Config = serde_json::from_slice(&res_string).unwrap();
@@ -159,6 +162,35 @@ async fn home(ctx: web::Query<Context>) -> impl Responder {
           <option value="cab" selected>Cab</option>
           <option value="auto">Auto</option>
         </select>
+
+        <label class="mt-4 block mb-2 text-lg font-medium text-gray-900 dark:text-white">Select hour of day</label>
+        <select class="bg-gray-50 text-lg border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="hour_of_day">
+          <option value="0" selected>0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+          <option value="13">13</option>
+          <option value="14">14</option>
+          <option value="15">15</option>
+          <option value="16">16</option>
+          <option value="17">17</option>
+          <option value="18">18</option>
+          <option value="19">19</option>
+          <option value="20">20</option>
+          <option value="21">21</option>
+          <option value="22">22</option>
+          <option value="23">23</option>
+</select>
+
       <form>
     </div>
     <div class="mx-20 content-stretch grid grid-cols-1" id="fare-table" hx-get="/fragments/app.html?city={city}" hx-trigger="load">
