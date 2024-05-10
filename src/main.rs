@@ -68,6 +68,7 @@ pub struct Config {
     currency: Currency,
     hello_message: String,
     hello_message_color: String,
+    logo: String,
 }
 
 #[get("/fragments/app.html")]
@@ -94,11 +95,16 @@ async fn app(ctx: web::Query<Context>) -> impl Responder {
           opacity: 0;
         }}
       }}
+
+      .logo {{
+        display: inline;
+      }}
     </style>
 
     <table class="table-auto border-separate border-spacing-2 border border-slate-400">
       <h2 class="my-4 text-xl sm:text-2xl text-slate-700 tracking-tight dark:text-slate-100">
         Fare for city: <span class="font-bold">{city}</span> - <span class="blink">{message}</span>
+        <img class="logo" height="100px" width="200px" src="{logo}">
       </h2>
       <thead>
         <tr>
@@ -122,7 +128,7 @@ async fn app(ctx: web::Query<Context>) -> impl Responder {
       </tbody>
       <tfoot>
       </tfoot>
-    </table>"#, currency = config.currency, base_rate = config.base_rate, per_distance_unit_rate = config.per_distance_unit_rate, total_fare = (config.base_rate + 10.0 * config.per_distance_unit_rate), distance_unit = config.distance_unit, message = config.hello_message, color = config.hello_message_color);
+    </table>"#, currency = config.currency, base_rate = config.base_rate, per_distance_unit_rate = config.per_distance_unit_rate, total_fare = (config.base_rate + 10.0 * config.per_distance_unit_rate), distance_unit = config.distance_unit, message = config.hello_message, color = config.hello_message_color, logo = config.logo);
 
     // HttpResponse::Ok().body()
     HttpResponse::Ok().body(table)
