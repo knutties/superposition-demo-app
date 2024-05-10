@@ -104,7 +104,7 @@ async fn app(ctx: web::Query<Context>) -> impl Responder {
     <table class="table-auto border-separate border-spacing-2 border border-slate-400">
       <h2 class="my-4 text-xl sm:text-2xl text-slate-700 tracking-tight dark:text-slate-100">
         Fare for city: <span class="font-bold">{city}</span> - <span class="blink">{message}</span>
-        <img class="logo" height="100px" width="200px" src="{logo}">
+        <img class="logo pl-4" height="100px" width="200px" src="{logo}">
       </h2>
       <thead>
         <tr>
